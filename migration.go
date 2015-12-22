@@ -18,14 +18,14 @@ func usage() {
 }
 
 type MigrationData struct {
-	whisperFile string
-	fromTimestamp uint32
+	whisperFile    string
+	fromTimestamp  uint32
 	untilTimestamp uint32
-	dbName string
-	tsmFiles []string
-	targetFile string
-	tags []string
-	measurement string
+	dbName         string
+	tsmFiles       []string
+	targetFile     string
+	tags           []string
+	measurement    string
 }
 
 var filename *string
@@ -40,14 +40,13 @@ func main() {
 		usage()
 	}
 
-  migrationData:=MigrationData{}
-  migrationData.whisperFile = *filename
+	migrationData := MigrationData{}
+	migrationData.whisperFile = *filename
 
-  //TODO: dbname and timestamp values should be input from user
-  migrationData.dbName ="mydb2"
-  migrationData.fromTimestamp=1449729960 //10dec start
-  migrationData.untilTimestamp=1449731880 //10 dec end
-
+	//TODO: dbname and timestamp values should be input from user
+	migrationData.dbName = "mydb2"
+	migrationData.fromTimestamp = 1449729960  //10dec start
+	migrationData.untilTimestamp = 1449731880 //10 dec end
 
 	if *info {
 		migrationData.WhisperInfo(*filename)
@@ -66,7 +65,7 @@ func IdentifyTags(filename string) string {
 	return "tag1=value1"
 }
 
-func(migrationData* MigrationData) WhisperInfo(filename string) {
+func (migrationData *MigrationData) WhisperInfo(filename string) {
 	w, err := whisper.Open(filename)
 	if err != nil {
 		log.Fatal(err)
@@ -84,7 +83,7 @@ func(migrationData* MigrationData) WhisperInfo(filename string) {
 	return
 }
 
-func(migrationData* MigrationData) ReadWSPWriteTSMRecords() {
+func (migrationData *MigrationData) ReadWSPWriteTSMRecords() {
 	// Open whisper file for reading
 	w, err := whisper.Open(migrationData.whisperFile)
 	if err != nil {
@@ -101,7 +100,7 @@ func(migrationData* MigrationData) ReadWSPWriteTSMRecords() {
 		return
 	}
 
- 	// Open tsm file for writing
+	// Open tsm file for writing
 	f, err := os.OpenFile(migrationData.targetFile, os.O_CREATE|os.O_RDWR, 0666)
 	if err != nil {
 		fmt.Println("File Open Error")
@@ -128,7 +127,7 @@ func(migrationData* MigrationData) ReadWSPWriteTSMRecords() {
 	for i, wspPoint := range wspPoints {
 		fmt.Println(i, wspPoint.Value, wspPoint.Timestamp)
 		tsmPt.values = append(tsmPt.values,
-			tsm1.NewValue(time.Unix(int64(wspPoint.Timestamp),0),wspPoint.Value))
+			tsm1.NewValue(time.Unix(int64(wspPoint.Timestamp), 0), wspPoint.Value))
 	}
 	//Write the points in batch
 
@@ -140,16 +139,16 @@ func(migrationData* MigrationData) ReadWSPWriteTSMRecords() {
 	}
 
 	//Write index
-  if err := tsmW.WriteIndex(); err != nil {
-    panic(fmt.Sprintf("write TSM index: %v", err))
-  }
+	if err := tsmW.WriteIndex(); err != nil {
+		panic(fmt.Sprintf("write TSM index: %v", err))
+	}
 
-  if err := tsmW.Close(); err != nil {
-    panic(fmt.Sprintf("write TSM close: %v", err))
-  }
+	if err := tsmW.Close(); err != nil {
+		panic(fmt.Sprintf("write TSM close: %v", err))
+	}
 }
 
-func (migrationData* MigrationData) FindTSMFiles () {
+func (migrationData *MigrationData) FindTSMFiles() {
 	searchDir := "/Users/uttam/.influxdb/data/" + migrationData.dbName
 
 	fileList := []string{}
@@ -165,12 +164,12 @@ func (migrationData* MigrationData) FindTSMFiles () {
 	for _, file := range fileList {
 		fmt.Println(file)
 	}
-	migrationData.tsmFiles=fileList
+	migrationData.tsmFiles = fileList
 }
 
 // finds the file which has overlapping timerange as input data
 // TODO: data may be written across multiple TSM files
-func(migrationData* MigrationData ) FindTheFileToWrite() {
+func (migrationData *MigrationData) FindTheFileToWrite() {
 	var file string
 	for _, file = range migrationData.tsmFiles {
 		f, err := os.Open(file)
@@ -193,7 +192,7 @@ func(migrationData* MigrationData ) FindTheFileToWrite() {
 		fmt.Println("TimeRange", t1, t2)
 		if t1.Unix() < int64(migrationData.fromTimestamp) &&
 			t2.Unix() > int64(migrationData.untilTimestamp) {
-			fmt.Println("File to write",file)
+			fmt.Println("File to write", file)
 		}
 	}
 	migrationData.targetFile = file
