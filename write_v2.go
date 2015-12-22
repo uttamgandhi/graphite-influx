@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	const string MyDB = "mydb3"
+	const MyDB string = "mydb2"
 
 	c, _ := client.NewHTTPClient(client.HTTPConfig{
 		Addr: "http://localhost:8086",
@@ -38,7 +38,7 @@ func main() {
 		t, _ := time.Parse(shortForm, day)
 		fmt.Println(t)
 
-		pt, _ := client.NewPoint("cpu_usage", tags, fields, t)
+		pt, _ := client.NewPoint("edepu3_usage", tags, fields, t)
 		bp.AddPoint(pt)
 	}
 	// Write the batch
