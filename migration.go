@@ -99,6 +99,8 @@ func main() {
 	migrationData.ReadTagConfig(*tagConfigFile)
 	migrationData.FindWhisperFiles(*wspPath)
 	migrationData.PreviewMTF()
+	//Update the config file
+	migrationData.WriteConfigFile(*tagConfigFile)
 	//After the preview, confirm if the user wants to migrate data
 	var userInput string
 	fmt.Println("Do you want to continue the migration? YES/NO :")
@@ -110,9 +112,6 @@ func main() {
 	migrationData.CreateShards()
 	//Map WSP to TSM
 	migrationData.MapWSPToTSMByShard()
-	//Update the config file
-	migrationData.WriteConfigFile(*tagConfigFile)
-
 }
 
 // Read the config file and populate migrartionData.tagConfigs
@@ -196,7 +195,7 @@ func (migrationData *MigrationData) FindWhisperFiles(searchDir string) {
 // Gives a preview how the measurements, tags and fields look like for given
 // whisper files and config file. Also will take input for new config if does
 // not exist already for a given pattern
-func (migrationData MigrationData) PreviewMTF() {
+func (migrationData *MigrationData) PreviewMTF() {
 	for _, wspFile := range migrationData.wspFiles {
 		var tagConfig *TagConfig
 		var mtf *MTF
